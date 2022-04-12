@@ -1,4 +1,4 @@
-# MAT-108trigo
+# Mathematics - 108trigo Project
 Language: Python
 
 As you may know (or not), the exponential function can be written as the sum of a power series:
