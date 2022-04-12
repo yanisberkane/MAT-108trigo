@@ -1,0 +1,223 @@
+#!/usr/bin/python3
+
+##
+## EPITECH PROJECT, 2021
+## B-MAT-200-PAR-2-1-106bombyx-rayan.banni
+## File description:
+## 106bombyx
+##
+
+import sys
+import math
+
+def my_is_digit(c):
+    if ((ord(c) < ord('0') or ord(c) > ord('9')) and c != '-' and c != '.'):
+        return False
+    return True
+
+def verif(argv):
+    for j in range(3, len(argv)):
+        for i in range(0, len(argv[j])):
+            if (my_is_digit(argv[j][i]) == False):
+                return False
+    return True
+
+def compute_factorial(n) -> float:
+    nb = n
+    factorial = 1
+
+    if (n == 0 or n == 1):
+        return 1
+    while (nb > 1):
+        factorial = factorial * nb
+        nb = nb - 1
+    return factorial
+
+def add_matrix(mat_1, mat_2) -> tuple:
+    temp_res = 0
+    results: list = []
+    matrix_res: tuple
+
+    for i in range (len(mat_1)):
+        for j in range (len(mat_2)):
+            temp_res = mat_1[i][j] + mat_2[i][j]
+            results.append(temp_res)
+            temp_res = 0
+    matrix_res = tuple(get_matrix(results))
+    return matrix_res
+
+def multiply_matrix(mat_1, mat_2) -> tuple:
+    temp_res = 0
+    results: list = []
+    matrix_res: tuple
+
+    for i in range (len(mat_1)):
+        for j in range (len(mat_2[i])):
+            for k in range (len(mat_2)):
+                temp_res = temp_res + mat_1[i][k] * mat_2[k][j]
+            results.append(temp_res)
+            temp_res = 0
+    matrix_res = tuple(get_matrix(results))
+    return matrix_res
+
+def compute_matrix_power(matrix : tuple, power_ind) -> tuple:
+    result = matrix
+
+    if (power_ind == 1):
+        return matrix
+    for i in range (power_ind - 1):
+        result = multiply_matrix(matrix, result)
+    return result
+
+def compute_fraction(matrix, n, factor) -> tuple:
+    pow_matrix = compute_matrix_power(matrix, n)
+    fact_n = compute_factorial(n)
+
+    for i in range (len(matrix)):
+        for j in range (len(matrix[i])):
+            pow_matrix[i][j] = pow_matrix[i][j] / fact_n
+    return compute_multiplication(pow_matrix, factor)
+
+def compute_multiplication(matrix, n) -> tuple:
+    result: tuple = matrix
+
+    for i in range (len(matrix)):
+        for j in range (len(matrix[i])):
+            if (result[i][j] == 0):
+                result[i][j] = matrix[i][j]
+            else:
+                result[i][j] = matrix[i][j] * n
+    return result
+
+def check_type(string) -> int:
+    if (string == 'EXP'):
+        return 0
+    if (string == 'COS'):
+        return 1
+    if (string == 'SIN'):
+        return 2
+    if (string == 'SINH'):
+        return 3
+    if (string == 'COSH'):
+        return 4
+    return 84
+
+def get_matrix(argv) -> list:
+    matrix: list = []
+    index = 0
+    for i in range (0, int(math.sqrt(len(argv)))):
+        elems = []
+        for j in range (0, int(math.sqrt(len(argv)))):
+            elems.append(float(argv[index]))
+            index = index + 1
+        matrix.append(elems)
+    return matrix
+
+def generate_identity_matrix(lines: int, cols: int) -> tuple:
+    id_matrix: list = []
+
+    for i in range (lines):
+        temp_list = []
+        for j in range (cols):
+            if j == i:
+                temp_list.append(1)
+            else:
+                temp_list.append(0)
+        id_matrix.append(temp_list)
+    return tuple(id_matrix)
+
+def compute_sinus(matrix: tuple, length: int) -> tuple:
+    result: tuple = matrix
+    i = 3
+    factor = -1
+
+    while (i < 100):
+        step_matrix = compute_fraction(matrix, i, factor)
+        result = add_matrix(result, step_matrix)
+        factor = factor * -1
+        i = i + 2
+    return result
+
+def compute_sinh(matrix: tuple, length: int) -> tuple:
+    result: tuple = matrix
+    i = 3
+
+    while (i < 100):
+        step_matrix = compute_fraction(matrix, i, 1)
+        result = add_matrix(result, step_matrix)
+        i = i + 2
+    return result
+
+def compute_cosh(matrix: tuple, length: int) -> tuple:
+    result: tuple = generate_identity_matrix(length, length)
+    i = 2
+
+    while (i < 100):
+        step_matrix = compute_fraction(matrix, i, 1)
+        result = add_matrix(result, step_matrix)
+        i = i + 2
+    return result
+
+def compute_cosinus(matrix: tuple, length: int) -> tuple:
+    result: tuple = generate_identity_matrix(length, length)
+    i = 2
+    factor = -1
+
+    while (i < 100):
+        step_matrix = compute_fraction(matrix, i, factor)
+        result = add_matrix(result, step_matrix)
+        factor = factor * -1
+        i = i + 2
+    return result
+
+def compute_exponential(matrix: tuple, length: int) -> tuple:
+    result: tuple = generate_identity_matrix(length, length)
+
+    for i in range (1, 100):
+        step_matrix = compute_fraction(matrix, i, 1)
+        result = add_matrix(result, step_matrix)
+    return result
+
+def compute_developement(argv, fun_type):
+    length: int = int(math.sqrt(len(argv)))
+    matrix: tuple = tuple(get_matrix(argv))
+    result: tuple = []
+
+    if (fun_type == 0):
+        result = compute_exponential(matrix, length)
+    elif (fun_type == 1):
+        result = compute_cosinus(matrix, length)
+    elif (fun_type == 2):
+        result = compute_sinus(matrix, length)
+    elif (fun_type == 3):
+        result = compute_sinh(matrix, length)
+    elif (fun_type == 4):
+        result = compute_cosh(matrix, length)
+    for i in range (len(result)):
+        for j in range (len(result[i])):
+            print(f"{result[i][j]:.2f}", end = "")
+            if (j != len(result[i]) - 1):
+                print("\t", end = "")
+        print("\n", end = "")
+    return
+
+def main(argv):
+    fun_type: int
+    with open("help.txt", "r") as help_file:
+        read = help_file.read()
+    if (len(argv) == 2 and argv[1] == "-h"):
+        print(read)
+    elif (len(argv) < 3):
+        return 84
+    elif (math.sqrt(len(argv) - 2) != math.ceil(math.sqrt(len(argv) - 2))
+or verif(argv) == False):
+        return 84
+    else:
+        fun_type = check_type(argv[1])
+        if (fun_type == 84):
+            return 84
+        compute_developement(argv[2:], fun_type)
+        return 0
+
+if __name__ == '__main__':
+    exit(main(sys.argv))
